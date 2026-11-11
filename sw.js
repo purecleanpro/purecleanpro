@@ -1,8 +1,8 @@
 /* PURE CLEAN PRO - service worker
    Troque o número da versão abaixo quando mudar os ícones ou o manifesto. */
-const VERSAO = 'estoque-v3';
+const VERSAO = 'estoque-v4';
 const ARQUIVOS = ['./', 'index.html', 'manifest.webmanifest',
-  'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/icon-180.png', 'icons/favicon-48.png'];
+  'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'icon-180.png', 'favicon-48.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSAO).then(c => c.addAll(ARQUIVOS)).then(() => self.skipWaiting()));
