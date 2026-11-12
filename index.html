@@ -686,7 +686,7 @@ $('#impFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)ret
   try{
    if(modo=='substituir'){db=d;msg='Dados substituídos com sucesso!'}
    else{const n=mesclarDb(d);msg='Mesclagem concluída: '+n.prods+' produto(s) novo(s), '+n.fotos+' foto(s) adicionada(s), '+n.vendas+' venda(s) e '+n.entradas+' entrada(s) de estoque.'}
-   localStorage.setItem('estq1',JSON.stringify(db))
+   db.cfg.atualizado=Date.now();localStorage.setItem('estq1',JSON.stringify(db))
   }catch(x){db=JSON.parse(antes);return alert('Este aparelho não tem espaço para guardar todos os dados e fotos. Nada foi alterado. Libere espaço no navegador e tente de novo.')}
   alert(msg);location.reload()};
  pdf?r.readAsText(f,'iso-8859-1'):r.readAsText(f,'utf-8')};
