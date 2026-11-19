@@ -28,7 +28,7 @@ input,select,textarea{width:100%;padding:9px 10px;border:1px solid #a9d9e6;borde
 input:focus,select:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
 .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 12px}
 button.b{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
-button.b.s{background:#dff6fb;color:var(--ink)}button.b.w{background:#0b8f4d}button.b.d{background:#fff;color:var(--bad);border:1px solid var(--bad)}
+button.b.s{background:#dff6fb;color:var(--ink)}button.b.w{background:#0b8f4d}button.b.sh{background:#1a73e8;width:52px;min-width:52px;padding:0;display:inline-flex;align-items:center;justify-content:center}button.b.sh svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}button.b.d{background:#fff;color:var(--bad);border:1px solid var(--bad)}
 button.sm{padding:5px 10px;font-size:13px}
 .tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
 th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -126,12 +126,13 @@ body.menu #side{transform:none}
 .pz-lg{flex:1;min-width:210px}.pz-lg>div{display:grid;grid-template-columns:14px 1fr auto 44px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
 .pz-lg i{width:12px;height:12px;border-radius:4px}.pz-lg span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pz-lg em{font-style:normal;color:var(--mut);text-align:right;font-size:13px}
 .pz-ch{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.cupom{background:#fff;color:#111;font:13px/1.45 "Courier New",Courier,"Liberation Mono",monospace;width:300px;max-width:100%;margin:0 auto 14px;padding:18px 16px;border-top:3px dashed #8fd0e0;border-bottom:3px dashed #8fd0e0;box-shadow:0 0 0 1px var(--line)}
+.cupom{background:#fff;color:#111;font:13px/1.45 "Courier New",Courier,"Liberation Mono",monospace;width:300px;max-width:100%;margin:0 auto 14px;padding:18px 16px;border-top:3px solid #8fd0e0;border-bottom:3px solid #8fd0e0;box-shadow:0 0 0 1px var(--line);font-weight:700}
+.cupom *{font-weight:700}
 .cp-t{font:700 21px/1.2 Georgia,"Times New Roman",serif;text-align:center;letter-spacing:.5px;text-transform:uppercase}
 .cp-s{text-align:center;font-style:italic;font-family:Georgia,"Times New Roman",serif;margin-top:2px}
 .cp-k{text-align:center;font-weight:700;letter-spacing:2px;margin-top:10px}.cp-n{text-align:center;font-size:11px;color:#555}
 .cp-x{margin:8px 0 0;text-align:center;font-weight:700;border:2px solid #b3261e;color:#b3261e;padding:3px}
-.cp-hr{border-top:1px dashed #333;margin:10px 0}.cp-r{display:flex;justify-content:space-between;gap:10px}
+.cp-hr{border-top:2px solid #333;margin:10px 0}.cp-r{display:flex;justify-content:space-between;gap:10px}
 .cp-i{font-weight:700;margin-top:4px}.cp-tot{font-size:17px;font-weight:700}
 .cp-f{text-align:center;font-style:italic;font-family:Georgia,"Times New Roman",serif}
 .hero{position:relative;background:linear-gradient(135deg,#055a73 0%,#0a7f9c 100%);color:#fff;border-radius:26px;padding:22px 18px 18px;margin-bottom:16px;text-align:center;overflow:hidden}
@@ -243,7 +244,7 @@ body.menu #side{transform:none}
 <section id="venda"><div class="vg">
  <div class="card"><h2>Escolha os produtos</h2><p class="dica">Toque no produto para colocar na venda.</p><input id="bv" placeholder="Buscar por referência ou marca"><div class="pg" id="pg"></div></div>
  <div class="card"><h2>Venda atual</h2><p class="dica">Confira, escolha como o cliente vai pagar e finalize.</p><div id="cart"></div>
-  <div class="fg2" style="margin-top:10px"><label>Desconto ao cliente<input id="dVal" type="number" min="0" step="0.01" placeholder="0"></label><label>Tipo<select id="dTipo"><option value="r">R$</option><option value="p">%</option></select></label></div>
+  <div class="fg2" style="margin-top:10px"><label>Desconto ao cliente<input id="dVal" type="text" inputmode="numeric" class="mny" placeholder="0,00" autocomplete="off"></label><label>Tipo<select id="dTipo"><option value="r">R$</option><option value="p">%</option></select></label></div>
   <div id="sumv"></div><div class="tot" id="total">R$ 0,00</div>
   <div class="pay" id="pay">
    <label><input type="radio" name="pg" value="din" checked>Dinheiro</label><label><input type="radio" name="pg" value="pix">Pix</label>
@@ -259,13 +260,13 @@ body.menu #side{transform:none}
  <div class="card"><h2 id="fTit">Novo produto</h2><p class="dica">Preencha os dados e toque em Salvar produto.</p>
  <form id="fp"><input type="hidden" name="pid">
   <div class="fg"><label>Referência<input name="ref" required></label><label>Marca<input name="marca" required></label><label>Descrição (opcional)<input name="desc"></label></div>
-  <div class="fg"><label>Quantidade que você tem agora<input name="qtd" type="number" min="0" step="1" required></label><label>Valor de compra (quanto pagou) R$<input name="compra" type="number" min="0" step="0.01" required></label>
-  <label>Valor de venda (preço ao cliente) R$<input name="venda" type="number" min="0" step="0.01" required></label><label>Quantidade ideal<small style="display:block">O sistema avisa quando tiver menos que isso</small><input name="ideal" type="number" min="0" step="1" required></label></div>
+  <div class="fg"><label>Quantidade que você tem agora<input name="qtd" type="number" min="0" step="1" required></label><label>Valor de compra (quanto pagou) R$<input name="compra" type="text" inputmode="numeric" class="mny" placeholder="0,00" autocomplete="off" required></label>
+  <label>Valor de venda (preço ao cliente) R$<input name="venda" type="text" inputmode="numeric" class="mny" placeholder="0,00" autocomplete="off" required></label><label>Quantidade ideal<small style="display:block">O sistema avisa quando tiver menos que isso</small><input name="ideal" type="number" min="0" step="1" required></label></div>
   <div style="margin-bottom:10px"><span style="font-size:13px;color:var(--mut)">Foto do produto</span>
    <div class="row" style="margin-top:4px"><label class="b s bord" style="margin:0;cursor:pointer">Tirar foto<input type="file" id="fotoCam" accept="image/*" capture="environment" hidden></label><label class="b s bord" style="margin:0;cursor:pointer">Escolher da galeria ou arquivos<input type="file" id="foto" accept="image/*" hidden></label></div></div><div id="pv"></div>
   <div class="row" style="margin-top:12px"><button class="b" type="submit">Salvar produto</button><button class="b s" type="button" id="cancel">Cancelar</button></div></form></div>
  <div class="card"><h2>Chegou mercadoria?</h2><p class="dica">Registre aqui para somar no estoque.</p>
- <div class="fg"><label>Produto<select id="eP"></select></label><label>Quantidade recebida<input id="eQ" type="number" min="1" step="1"></label><label>Novo valor de compra (opcional)<input id="eC" type="number" min="0" step="0.01"></label></div>
+ <div class="fg"><label>Produto<select id="eP"></select></label><label>Quantidade recebida<input id="eQ" type="number" min="1" step="1"></label><label>Novo valor de compra (opcional)<input id="eC" type="text" inputmode="numeric" class="mny" placeholder="0,00" autocomplete="off"></label></div>
  <button class="b" id="eBtn" type="button">Registrar entrada</button><div id="eH" style="margin-top:12px"></div></div>
  <h2 style="margin:6px 2px 4px">Produtos cadastrados</h2><p class="dica" id="uso" style="margin:0 2px 12px"></p><div class="pgrid" id="tbProd"></div>
 </section>
@@ -337,7 +338,7 @@ body.menu #side{transform:none}
 
 <div id="rec"><div class="card"><h2>Venda concluída</h2><div id="recBox" class="cupom"></div><p class="dica" id="recNote" style="margin:0 0 10px">Comprovante finalizado: os dados da venda não podem ser alterados.</p>
  <label>WhatsApp do cliente<input id="recTel" inputmode="tel" placeholder="(11) 99999-9999"></label>
- <div class="row"><button class="b w" id="recWa">Enviar comprovante no WhatsApp</button><button class="b s" id="recPr">Imprimir comprovante</button><button class="b s" id="recX">Fechar</button></div></div></div>
+ <div class="row"><div style="display:flex;gap:8px;width:100%;align-items:stretch"><button class="b w" id="recWa" style="flex:1">Enviar comprovante no WhatsApp</button><button class="b sh" id="recSh" style="background:#1a73e8;width:56px;min-width:56px;padding:0" aria-label="Compartilhar comprovante" title="Compartilhar"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button></div><div style="display:flex;gap:8px;width:100%"><button class="b s" id="recPr" style="flex:1">Imprimir comprovante</button><button class="b s" id="recX" style="flex:1">Fechar</button></div></div></div></div>
 
 <div id="aut"><div class="card"><h2>Relatório do dia</h2><p class="dica" id="autInfo"></p><pre id="autTxt" style="white-space:pre-wrap"></pre><div class="row" id="autBt"></div><div class="row" style="margin-top:10px"><button class="b s" id="autX">Fechar</button></div></div></div>
 
@@ -349,6 +350,8 @@ let db;try{db=JSON.parse(localStorage.getItem('estq1'))}catch(e){}
 db=db||{prods:[],sales:[],cfg:{loja:'',donos:[]}};db.entradas=db.entradas||[];
 const salvaLocal=()=>{try{localStorage.setItem('estq1',JSON.stringify(db))}catch(e){alert('Sem espaço para salvar. Use fotos menores ou remova produtos antigos.')}};
 const save=()=>{db.cfg.atualizado=Date.now();salvaLocal();if(window.fbAgenda)fbAgenda()};
+const fm=n=>(Math.round((+n||0)*100)/100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}),mv=e=>{const d=String(e.value).replace(/\D/g,"");return d?+d/100:0};
+addEventListener("input",e=>{const t=e.target;if(!t.classList||!t.classList.contains("mny"))return;if(t.id=="dVal"&&$("#dTipo").value=="p"){t.value=t.value.replace(/[^0-9,]/g,"").replace(/,(?=.*,)/g,"").slice(0,6);return}const d=t.value.replace(/\D/g,"").replace(/^0+/,"").slice(0,11);t.value=d?fm(+d/100):""},true);
 const R=n=>(+n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
@@ -404,7 +407,7 @@ $('#foto').onchange=$('#fotoCam').onchange=e=>{const f=e.target.files[0];if(!f)r
 function limpa(){$('#fp').reset();$('#fp').pid.value='';foto='';$('#pv').innerHTML='';$('#fTit').textContent='Novo produto'}
 $('#cancel').onclick=limpa;
 $('#fp').onsubmit=e=>{e.preventDefault();const f=e.target,id=f.pid.value||uid();
- const o={id,ref:f.ref.value.trim(),marca:f.marca.value.trim(),desc:f.desc.value.trim(),qtd:+f.qtd.value,compra:+f.compra.value,venda:+f.venda.value,ideal:+f.ideal.value,foto};
+ const o={id,ref:f.ref.value.trim(),marca:f.marca.value.trim(),desc:f.desc.value.trim(),qtd:+f.qtd.value,compra:mv(f.compra),venda:mv(f.venda),ideal:+f.ideal.value,foto};
  if(db.prods.some(p=>p.id!=id&&p.ref.toLowerCase()==o.ref.toLowerCase()&&p.marca.toLowerCase()==o.marca.toLowerCase())&&!confirm('Já existe um produto com essa referência e marca. Salvar mesmo assim?'))return;
  const i=db.prods.findIndex(p=>p.id==id);if(i<0){db.prods.push(o);if(o.qtd>0)db.entradas.push({ts:Date.now(),pid:id,ref:o.ref,marca:o.marca,qtd:o.qtd,custo:o.compra,tipo:'Cadastro do produto'})}else{const d=o.qtd-db.prods[i].qtd;if(d){db.entradas.push({ts:Date.now(),pid:id,ref:o.ref,marca:o.marca,qtd:d,custo:o.compra,tipo:'Ajuste manual de quantidade'})}db.prods[i]=o}save();limpa();rProd()};
 function rProd(){rEnt();rUso();$('#tbProd').innerHTML=db.prods.map(p=>`<div class="pk"><div class="pk-img" onclick="zoom('${p.id}')">${img(p)}</div><div class="pk-s"><b class="pk-ref">${esc(p.ref)}</b><span class="pk-m">${esc(p.marca)}${p.desc?' · '+esc(p.desc):''}</span><b class="pk-pr">${R(p.venda)}</b></div><div class="pk-b"><div class="pk-l"><span>Compra</span><b>${R(p.compra)}</b></div><div class="pk-l"><span>Em estoque</span><b>${p.qtd}</b></div><div class="ac"><button class="b s sm" onclick="edit('${p.id}')">Editar</button><button class="b d sm" onclick="del('${p.id}')">Excluir</button></div></div></div>`).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum produto cadastrado ainda.</div>'}
@@ -414,9 +417,9 @@ function rEnt(){const v=$('#eP').value;
  $('#eH').innerHTML=db.entradas.filter(e=>!e.tipo).slice(-5).reverse().map(e=>`<div class="cl"><span>${dt(e.ts)} · ${esc(e.ref)}</span><b>+${e.qtd}</b></div>`).join('')}
 $('#eBtn').onclick=()=>{const p=db.prods.find(x=>x.id==$('#eP').value),q=+$('#eQ').value;
  if(!p||!(q>0))return alert('Escolha o produto e informe a quantidade recebida.');
- p.qtd+=q;if($('#eC').value!=='')p.compra=+$('#eC').value;
+ p.qtd+=q;if($('#eC').value!=='')p.compra=mv($('#eC'));
  db.entradas.push({ts:Date.now(),pid:p.id,ref:p.ref,marca:p.marca,qtd:q,custo:p.compra});save();$('#eQ').value=$('#eC').value='';rProd()};
-function edit(id){show('prod');const p=db.prods.find(x=>x.id==id),f=$('#fp');f.pid.value=id;['ref','marca','desc','qtd','compra','venda','ideal'].forEach(k=>f[k].value=p[k]);foto=p.foto||'';$('#pv').innerHTML=foto?`<img class="pv" src="${foto}" alt="">`:'';$('#fTit').textContent='Editar produto';scrollTo({top:0,behavior:'smooth'})}
+function edit(id){show('prod');const p=db.prods.find(x=>x.id==id),f=$('#fp');f.pid.value=id;['ref','marca','desc','qtd','compra','venda','ideal'].forEach(k=>f[k].value=(k=='compra'||k=='venda')?fm(p[k]):p[k]);foto=p.foto||'';$('#pv').innerHTML=foto?`<img class="pv" src="${foto}" alt="">`:'';$('#fTit').textContent='Editar produto';scrollTo({top:0,behavior:'smooth'})}
 function del(id){const p=db.prods.find(x=>x.id==id);if(p&&confirm('Excluir o produto "'+p.ref+' ('+p.marca+')"? O histórico de vendas é mantido.')){db.prods=db.prods.filter(x=>x.id!=id);if($('#fp').pid.value==id)limpa();cart=cart.filter(c=>c.pid!=id);save();show($('section.on').id)}}
 
 /* vendas */
@@ -430,8 +433,8 @@ function rVenda(){const q=$('#bv').value.toLowerCase();
 function add(id){const p=db.prods.find(x=>x.id==id),c=cart.find(x=>x.pid==id);if(c){if(c.qtd<p.qtd)c.qtd++}else cart.push({pid:id,qtd:1});rCart()}
 function chg(id,d){const p=db.prods.find(x=>x.id==id),c=cart.find(x=>x.pid==id);c.qtd=Math.min(p.qtd,c.qtd+d);if(c.qtd<1)cart=cart.filter(x=>x.pid!=id);rCart()}
 const cartTotal=()=>cart.reduce((a,c)=>a+c.qtd*db.prods.find(p=>p.id==c.pid).venda,0);
-const descVal=()=>{const v=Math.max(0,+$('#dVal').value||0),sub=cartTotal();return Math.min(sub,$('#dTipo').value=='p'?Math.round(sub*Math.min(v,100))/100:v)};
-$('#dVal').oninput=()=>rCart();$('#dTipo').onchange=()=>rCart();
+const descVal=()=>{const v=Math.max(0,$('#dTipo').value=='p'?(parseFloat($('#dVal').value.replace(',','.'))||0):mv($('#dVal'))),sub=cartTotal();return Math.min(sub,$('#dTipo').value=='p'?Math.round(sub*Math.min(v,100))/100:v)};
+$('#dVal').oninput=()=>rCart();$('#dTipo').onchange=()=>{$('#dVal').value='';rCart()};
 $('#cancV').onclick=()=>{if(!cart.length&&!$('#cNome').value&&!$('#cTel').value&&!$('#dVal').value)return;if(confirm('Cancelar esta venda? Os produtos saem da venda e nada é cobrado.')){cart=[];$('#cNome').value=$('#cTel').value=$('#dVal').value='';rCart()}};
 function rCart(){
  $('#cart').innerHTML=cart.map(c=>{const p=db.prods.find(x=>x.id==c.pid);return `<div class="cl"><div class="cl-p">${img(p)}<div>${esc(p.ref)}<small style="display:block;color:var(--mut)">${esc(p.marca)} · ${R(p.venda)}</small></div></div><div class="q"><button onclick="chg('${p.id}',-1)" aria-label="Diminuir">−</button><b>${c.qtd}</b><button onclick="chg('${p.id}',1)" aria-label="Aumentar">+</button></div></div>`}).join('')||'<div class="vazio">Toque em um produto para adicionar.</div>';
@@ -447,7 +450,7 @@ $('#fin').onclick=()=>{
 
 /* recibo */
 const dt=ts=>new Date(ts).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});
-const W=32,LN='-'.repeat(W),money=n=>R(n).replace(/\u00a0/g,' ');
+const W=32,LN='\u2500'.repeat(W),money=n=>R(n).replace(/\u00a0/g,' ');
 const ctr=t=>' '.repeat(Math.max(0,(W-t.length)>>1))+t;
 const lr=(a,b)=>{a=a.slice(0,Math.max(1,W-b.length-1));return a+' '.repeat(Math.max(1,W-a.length-b.length))+b};
 const reciboTxt=s=>[ctr((s.loja||loja()).toUpperCase().slice(0,W)),...((s.slg!==undefined?s.slg:db.cfg.slogan)?[ctr((s.slg!==undefined?s.slg:db.cfg.slogan).slice(0,W))]:[]),ctr('COMPROVANTE DE VENDA'),...(s.canc?[ctr('** VENDA CANCELADA **')]:[]),ctr('(sem valor fiscal)'),LN,
@@ -466,6 +469,42 @@ function reciboHtml(s){const sg=s.slg!==undefined?s.slg:db.cfg.slogan,hr='<div c
 let recS=null;
 function openRec(s){recS=s;$('#recBox').innerHTML=reciboHtml(s);const t=$('#recTel');t.value=s.tel||'';t.readOnly=!!s.tel;$('#rec').classList.add('on')}
 $('#recWa').onclick=()=>wa($('#recTel').value,'```\n'+reciboTxt(recS)+'\n```');
+
+/* imagem do comprovante (desenhada no canvas) e botão de compartilhar */
+function reciboImg(s){
+ const SC=2,CW=600,PD=40,IW=CW-PD*2,MONO='"Courier New",Courier,"Liberation Mono",monospace',SER='Georgia,"Times New Roman",serif',sg=s.slg!==undefined?s.slg:db.cfg.slogan;
+ const ops=[];const hr=()=>ops.push({k:'hr'}),row=(a,b,o)=>ops.push({k:'r',a,b,o:o||{}});
+ ops.push({k:'t',t:(s.loja||loja()).toUpperCase()});if(sg)ops.push({k:'s',t:sg});
+ ops.push({k:'k',t:'COMPROVANTE DE VENDA'},{k:'n',t:'(sem valor fiscal)'});if(s.canc)ops.push({k:'x',t:'VENDA CANCELADA'});
+ hr();row('Compra nº '+s.id,dt(s.ts));if(s.cliente)row('Cliente',s.cliente);hr();
+ s.items.forEach(i=>{ops.push({k:'i',t:i.ref+' ('+i.marca+')'});row(i.qtd+' x '+money(i.preco),money(i.qtd*i.preco))});hr();
+ if(s.desc){row('Subtotal',money(s.sub));row('Desconto','- '+money(s.desc))}row('TOTAL',money(s.total),{big:1});hr();
+ row('Pagamento',PAY[s.pay]);if(s.pay=='cre')row('Parcelas',s.parc+'x de '+money(s.total/s.parc));hr();
+ ops.push({k:'f',t:'Obrigado pela preferência!'},{k:'f',t:'Volte sempre!'});
+ const wrap=(x,t,mw)=>{const w=t.split(' '),L=[];let c='';w.forEach(p=>{const n=c?c+' '+p:p;if(x.measureText(n).width>mw&&c){L.push(c);c=p}else c=n});if(c)L.push(c);return L};
+ const draw=(x,paint)=>{let y=34;x.textBaseline='alphabetic';x.textAlign='left';
+  ops.forEach(o=>{
+   if(o.k=='t'){x.font='700 42px '+SER;x.fillStyle='#111';wrap(x,o.t,IW).forEach(l=>{y+=44;if(paint){x.textAlign='center';x.fillText(l,CW/2,y)}});y+=4}
+   else if(o.k=='s'){x.font='italic 700 28px '+SER;x.fillStyle='#111';wrap(x,o.t,IW).forEach(l=>{y+=34;if(paint){x.textAlign='center';x.fillText(l,CW/2,y)}})}
+   else if(o.k=='k'){y+=44;if(paint){x.font='700 28px '+MONO;x.fillStyle='#111';x.textAlign='center';x.fillText(o.t,CW/2,y)}}
+   else if(o.k=='n'){y+=28;if(paint){x.font='700 21px '+MONO;x.fillStyle='#555';x.textAlign='center';x.fillText(o.t,CW/2,y)}}
+   else if(o.k=='x'){y+=16;if(paint){x.strokeStyle='#b3261e';x.lineWidth=3;x.strokeRect(PD+60,y,IW-120,44);x.font='700 26px '+MONO;x.fillStyle='#b3261e';x.textAlign='center';x.fillText(o.t,CW/2,y+31)}y+=44}
+   else if(o.k=='hr'){y+=18;if(paint){x.fillStyle='#333';x.fillRect(PD,y,IW,3)}y+=14}
+   else if(o.k=='i'){x.font='700 26px '+MONO;x.fillStyle='#111';wrap(x,o.t,IW).forEach(l=>{y+=34;if(paint){x.textAlign='left';x.fillText(l,PD,y)}})}
+   else if(o.k=='r'){const sz=o.o.big?34:26;x.font='700 '+sz+'px '+MONO;x.fillStyle='#111';const bw=x.measureText(o.b).width,mw=IW-bw-20;let a=o.a;
+    const L=wrap(x,a,mw);y+=sz+10;if(paint){x.textAlign='left';x.fillText(L[0]||'',PD,y);x.textAlign='right';x.fillText(o.b,PD+IW,y)}
+    L.slice(1).forEach(l=>{y+=sz+4;if(paint){x.textAlign='left';x.fillText(l,PD,y)}})}
+   else if(o.k=='f'){y+=36;if(paint){x.font='italic 700 28px '+SER;x.fillStyle='#111';x.textAlign='center';x.fillText(o.t,CW/2,y)}}
+  });return y+34};
+ const m=document.createElement('canvas').getContext('2d'),H=draw(m,false),c=document.createElement('canvas');c.width=CW*SC;c.height=H*SC;
+ const x=c.getContext('2d');x.scale(SC,SC);x.fillStyle='#fff';x.fillRect(0,0,CW,H);x.fillStyle='#8fd0e0';x.fillRect(0,0,CW,6);x.fillRect(0,H-6,CW,6);draw(x,true);
+ return new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(new Error('Não foi possível gerar a imagem.')),'image/png'))}
+$('#recSh').onclick=async()=>{const b=$('#recSh');b.disabled=true;
+ try{const blob=await reciboImg(recS),f=new File([blob],'comprovante-'+recS.id+'.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({files:[f],title:'Comprovante de venda'});
+  else{baixa(f,f.name);alert('Este aparelho não abre o menu de compartilhar. A imagem do comprovante foi baixada: envie por onde preferir.')}}
+ catch(e){if(e&&e.name!='AbortError')alert('Não foi possível compartilhar: '+(e.message||e))}
+ b.disabled=false};
 $('#recPr').onclick=()=>print();
 $('#recX').onclick=()=>$('#rec').classList.remove('on');
 
