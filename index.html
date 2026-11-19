@@ -28,7 +28,7 @@ input,select,textarea{width:100%;padding:9px 10px;border:1px solid #a9d9e6;borde
 input:focus,select:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
 .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 12px}
 button.b{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
-button.b.s{background:#dff6fb;color:var(--ink)}button.b.w{background:#0b8f4d}button.b.sh{background:#1a73e8;width:52px;min-width:52px;padding:0;display:inline-flex;align-items:center;justify-content:center}button.b.sh svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}button.b.d{background:#fff;color:var(--bad);border:1px solid var(--bad)}
+button.b.s{background:#dff6fb;color:var(--ink)}button.b.w{background:#0b8f4d}button.b.sh{width:52px;min-width:52px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center}button.b.sh svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}button.b.d{background:#fff;color:var(--bad);border:1px solid var(--bad)}
 button.sm{padding:5px 10px;font-size:13px}
 .tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
 th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
@@ -126,8 +126,8 @@ body.menu #side{transform:none}
 .pz-lg{flex:1;min-width:210px}.pz-lg>div{display:grid;grid-template-columns:14px 1fr auto 44px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
 .pz-lg i{width:12px;height:12px;border-radius:4px}.pz-lg span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pz-lg em{font-style:normal;color:var(--mut);text-align:right;font-size:13px}
 .pz-ch{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.cupom{background:#fff;color:#111;font:13px/1.45 "Courier New",Courier,"Liberation Mono",monospace;width:300px;max-width:100%;margin:0 auto 14px;padding:18px 16px;border-top:3px solid #8fd0e0;border-bottom:3px solid #8fd0e0;box-shadow:0 0 0 1px var(--line);font-weight:700}
-.cupom *{font-weight:700}
+.cupom{background:#fff;color:#111;font:13px/1.45 "Roboto Mono","Noto Sans Mono","DejaVu Sans Mono","Liberation Mono",Menlo,Consolas,monospace;width:300px;max-width:100%;margin:0 auto 14px;padding:18px 16px;border-top:3px solid #8fd0e0;border-bottom:3px solid #8fd0e0;box-shadow:0 0 0 1px var(--line);font-weight:700}
+.cupom *{font-weight:700}.cupom{-webkit-text-stroke:.35px #111}.cupom .cp-n{-webkit-text-stroke:0}
 .cp-t{font:700 21px/1.2 Georgia,"Times New Roman",serif;text-align:center;letter-spacing:.5px;text-transform:uppercase}
 .cp-s{text-align:center;font-style:italic;font-family:Georgia,"Times New Roman",serif;margin-top:2px}
 .cp-k{text-align:center;font-weight:700;letter-spacing:2px;margin-top:10px}.cp-n{text-align:center;font-size:11px;color:#555}
@@ -338,7 +338,7 @@ body.menu #side{transform:none}
 
 <div id="rec"><div class="card"><h2>Venda concluída</h2><div id="recBox" class="cupom"></div><p class="dica" id="recNote" style="margin:0 0 10px">Comprovante finalizado: os dados da venda não podem ser alterados.</p>
  <label>WhatsApp do cliente<input id="recTel" inputmode="tel" placeholder="(11) 99999-9999"></label>
- <div class="row"><div style="display:flex;gap:8px;width:100%;align-items:stretch"><button class="b w" id="recWa" style="flex:1">Enviar comprovante no WhatsApp</button><button class="b sh" id="recSh" style="background:#1a73e8;width:56px;min-width:56px;padding:0" aria-label="Compartilhar comprovante" title="Compartilhar"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button></div><div style="display:flex;gap:8px;width:100%"><button class="b s" id="recPr" style="flex:1">Imprimir comprovante</button><button class="b s" id="recX" style="flex:1">Fechar</button></div></div></div></div>
+ <div class="row"><button class="b w" id="recWa">Enviar comprovante no WhatsApp</button><button class="b sh" id="recSh" aria-label="Compartilhar comprovante" title="Compartilhar"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button><button class="b s" id="recPr">Imprimir comprovante</button><button class="b s" id="recX">Fechar</button></div></div></div>
 
 <div id="aut"><div class="card"><h2>Relatório do dia</h2><p class="dica" id="autInfo"></p><pre id="autTxt" style="white-space:pre-wrap"></pre><div class="row" id="autBt"></div><div class="row" style="margin-top:10px"><button class="b s" id="autX">Fechar</button></div></div></div>
 
@@ -472,7 +472,7 @@ $('#recWa').onclick=()=>wa($('#recTel').value,'```\n'+reciboTxt(recS)+'\n```');
 
 /* imagem do comprovante (desenhada no canvas) e botão de compartilhar */
 function reciboImg(s){
- const SC=2,CW=600,PD=40,IW=CW-PD*2,MONO='"Courier New",Courier,"Liberation Mono",monospace',SER='Georgia,"Times New Roman",serif',sg=s.slg!==undefined?s.slg:db.cfg.slogan;
+ const SC=2,CW=600,PD=40,IW=CW-PD*2,MONO='"Roboto Mono","Noto Sans Mono","DejaVu Sans Mono","Liberation Mono",Menlo,Consolas,monospace',SER='Georgia,"Times New Roman",serif',sg=s.slg!==undefined?s.slg:db.cfg.slogan;
  const ops=[];const hr=()=>ops.push({k:'hr'}),row=(a,b,o)=>ops.push({k:'r',a,b,o:o||{}});
  ops.push({k:'t',t:(s.loja||loja()).toUpperCase()});if(sg)ops.push({k:'s',t:sg});
  ops.push({k:'k',t:'COMPROVANTE DE VENDA'},{k:'n',t:'(sem valor fiscal)'});if(s.canc)ops.push({k:'x',t:'VENDA CANCELADA'});
