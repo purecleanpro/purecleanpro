@@ -350,8 +350,8 @@ let db;try{db=JSON.parse(localStorage.getItem('estq1'))}catch(e){}
 db=db||{prods:[],sales:[],cfg:{loja:'',donos:[]}};db.entradas=db.entradas||[];
 const salvaLocal=()=>{try{localStorage.setItem('estq1',JSON.stringify(db))}catch(e){alert('Sem espaço para salvar. Use fotos menores ou remova produtos antigos.')}};
 const save=()=>{db.cfg.atualizado=Date.now();salvaLocal();if(window.fbAgenda)fbAgenda()};
-const fm=n=>(Math.round((+n||0)*100)/100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}),mv=e=>{const d=String(e.value).replace(/\D/g,"");return d?+d/100:0};
-addEventListener("input",e=>{const t=e.target;if(!t.classList||!t.classList.contains("mny"))return;if(t.id=="dVal"&&$("#dTipo").value=="p"){t.value=t.value.replace(/[^0-9,]/g,"").replace(/,(?=.*,)/g,"").slice(0,6);return}const d=t.value.replace(/\D/g,"").replace(/^0+/,"").slice(0,11);t.value=d?fm(+d/100):""},true);
+const rd=n=>Math.round(((+n||0)+Number.EPSILON)*100)/100,fm=n=>(Math.round((+n||0)*100)/100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}),mv=e=>{const d=String(e.value).replace(/\D/g,"");return d?+d/100:0};
+addEventListener("input",e=>{const t=e.target;if(!t.classList||!t.classList.contains("mny"))return;if(t.id=="dVal"&&$("#dTipo").value=="p"){let n=t.value.replace(/\./g,",").replace(/[^0-9,]/g,"").replace(/,(?=.*,)/g,"").slice(0,6);if((parseFloat(n.replace(",","."))||0)>100)n="100";t.value=n;return}const d=t.value.replace(/\D/g,"").replace(/^0+/,"").slice(0,11);t.value=d?fm(+d/100):""},true);
 const R=n=>(+n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
@@ -433,18 +433,19 @@ function rVenda(){const q=$('#bv').value.toLowerCase();
 function add(id){const p=db.prods.find(x=>x.id==id),c=cart.find(x=>x.pid==id);if(c){if(c.qtd<p.qtd)c.qtd++}else cart.push({pid:id,qtd:1});rCart()}
 function chg(id,d){const p=db.prods.find(x=>x.id==id),c=cart.find(x=>x.pid==id);c.qtd=Math.min(p.qtd,c.qtd+d);if(c.qtd<1)cart=cart.filter(x=>x.pid!=id);rCart()}
 const cartTotal=()=>cart.reduce((a,c)=>a+c.qtd*db.prods.find(p=>p.id==c.pid).venda,0);
-const descVal=()=>{const v=Math.max(0,$('#dTipo').value=='p'?(parseFloat($('#dVal').value.replace(',','.'))||0):mv($('#dVal'))),sub=cartTotal();return Math.min(sub,$('#dTipo').value=='p'?Math.round(sub*Math.min(v,100))/100:v)};
-$('#dVal').oninput=()=>rCart();$('#dTipo').onchange=()=>{$('#dVal').value='';rCart()};
+const descVal=()=>{const v=Math.max(0,$('#dTipo').value=='p'?(parseFloat($('#dVal').value.replace('%','').replace(',','.'))||0):mv($('#dVal'))),sub=cartTotal();return Math.min(sub,$('#dTipo').value=='p'?Math.round(sub*Math.min(v,100))/100:v)};
+const calcV=()=>{const sub=rd(cartTotal()),desc=rd(Math.min(descVal(),sub));return{sub,desc,total:rd(sub-desc)}};
+$('#dVal').oninput=()=>rCart();$('#dTipo').onchange=()=>{$('#dVal').value='';$('#dVal').inputMode=$('#dTipo').value=='p'?'decimal':'numeric';$('#dVal').placeholder=$('#dTipo').value=='p'?'0':'0,00';rCart()};
 $('#cancV').onclick=()=>{if(!cart.length&&!$('#cNome').value&&!$('#cTel').value&&!$('#dVal').value)return;if(confirm('Cancelar esta venda? Os produtos saem da venda e nada é cobrado.')){cart=[];$('#cNome').value=$('#cTel').value=$('#dVal').value='';rCart()}};
 function rCart(){
  $('#cart').innerHTML=cart.map(c=>{const p=db.prods.find(x=>x.id==c.pid);return `<div class="cl"><div class="cl-p">${img(p)}<div>${esc(p.ref)}<small style="display:block;color:var(--mut)">${esc(p.marca)} · ${R(p.venda)}</small></div></div><div class="q"><button onclick="chg('${p.id}',-1)" aria-label="Diminuir">−</button><b>${c.qtd}</b><button onclick="chg('${p.id}',1)" aria-label="Aumentar">+</button></div></div>`}).join('')||'<div class="vazio">Toque em um produto para adicionar.</div>';
- const sub=cartTotal(),dd=descVal();$('#sumv').innerHTML=dd?`<div class="cl"><span>Subtotal</span><span>${R(sub)}</span></div><div class="cl"><span>Desconto</span><span>− ${R(dd)}</span></div>`:'';$('#total').textContent=R(sub-dd);$('#parcW').hidden=$('input[name=pg]:checked').value!='cre';syncPc()}
+ const {sub,desc:dd,total:tt}=calcV();$('#sumv').innerHTML=dd?`<div class="cl"><span>Subtotal</span><span>${R(sub)}</span></div><div class="cl"><span>Desconto${$('#dTipo').value=='p'?' ('+String(Math.min(100,parseFloat($('#dVal').value.replace(',','.'))||0)).replace('.',',')+'%)':''}</span><span>− ${R(dd)}</span></div>`:'';$('#total').textContent=R(tt);$('#parcW').hidden=$('input[name=pg]:checked').value!='cre';syncPc()}
 function syncPc(){$$('#pg .pc').forEach(b=>{const c=cart.find(x=>x.pid==b.dataset.id);b.classList.toggle('sel',!!c);b.querySelector('.pq').textContent=c?c.qtd:''})}
 $('#fin').onclick=()=>{
  if(!cart.length)return alert('Adicione ao menos um produto.');
  const pay=$('input[name=pg]:checked').value,items=cart.map(c=>{const p=db.prods.find(x=>x.id==c.pid);return {pid:p.id,ref:p.ref,marca:p.marca,qtd:c.qtd,preco:p.venda,custo:p.compra}});
  if(items.some(i=>i.qtd>db.prods.find(p=>p.id==i.pid).qtd))return alert('Estoque insuficiente para algum item.');
- const s={id:db.sales.length+1,ts:Date.now(),cliente:$('#cNome').value.trim(),tel:$('#cTel').value,pay,parc:pay=='cre'?+$('#parc').value:1,items,sub:cartTotal(),desc:descVal(),total:cartTotal()-descVal(),loja:loja(),slg:db.cfg.slogan||''};
+ const cv=calcV(),s={id:db.sales.length+1,ts:Date.now(),cliente:$('#cNome').value.trim(),tel:$('#cTel').value,pay,parc:pay=='cre'?+$('#parc').value:1,items,sub:cv.sub,desc:cv.desc,total:cv.total,loja:loja(),slg:db.cfg.slogan||''};
  items.forEach(i=>db.prods.find(p=>p.id==i.pid).qtd-=i.qtd);
  db.sales.push(s);save();cart=[];$('#cNome').value=$('#cTel').value=$('#dVal').value='';rVenda();openRec(s)};
 
@@ -576,10 +577,11 @@ function rEstCard(){const P=db.prods,n=P.length,pc=P.reduce((a,p)=>a+p.qtd,0),cu
  <button class="b s bord" id="goLista" type="button" style="width:100%;margin-top:14px">Visualizar estoque</button>`;
  $('#goProd').onclick=()=>show('prod');$('#goLista').onclick=()=>show('estoque')}
 /* histórico */
+const vendaVals=s=>{const b=s.items.map(i=>i.qtd*i.preco),sub=b.reduce((a,x)=>a+x,0);if(!(s.desc>0)||!(sub>0))return b;const tot=s.total!==undefined?s.total:sub-s.desc;let acc=0;return b.map((x,k)=>{if(k==b.length-1)return rd(tot-acc);const v=rd(x*tot/sub);acc=rd(acc+v);return v})};
 function movs(){const L=[];
  db.entradas.forEach(e=>L.push({ts:e.ts,pid:e.pid,ref:e.ref,marca:e.marca,q:e.qtd,t:e.tipo||'Entrada de mercadoria',c:!e.tipo?'compra':e.tipo.startsWith('Ajuste')?'ajuste':'cadastro',v:e.qtd*(e.custo||0)}));
- db.sales.forEach(s=>{s.items.forEach(i=>L.push({ts:s.ts,pid:i.pid,ref:i.ref,marca:i.marca,q:-i.qtd,t:'Venda nº '+s.id,c:'venda',v:i.qtd*i.preco}));
-  if(s.canc)s.items.forEach(i=>L.push({ts:s.canc,pid:i.pid,ref:i.ref,marca:i.marca,q:i.qtd,t:'Cancelamento da venda nº '+s.id,c:'cancel',v:i.qtd*i.preco}))});
+ db.sales.forEach(s=>{const vv=vendaVals(s);s.items.forEach((i,k)=>L.push({ts:s.ts,pid:i.pid,ref:i.ref,marca:i.marca,q:-i.qtd,t:'Venda nº '+s.id,c:'venda',v:vv[k]}));
+  if(s.canc)s.items.forEach((i,k)=>L.push({ts:s.canc,pid:i.pid,ref:i.ref,marca:i.marca,q:i.qtd,t:'Cancelamento da venda nº '+s.id,c:'cancel',v:vv[k]}))});
  L.sort((a,b)=>b.ts-a.ts);const cur={};db.prods.forEach(p=>cur[p.id]=p.qtd);
  L.forEach(m=>{if(m.pid in cur){m.dep=cur[m.pid];cur[m.pid]-=m.q;m.antes=cur[m.pid]}});return L}
 function hisFiltro(){const per=$('#hPer').value,t=$('#hTipo').value,pr=$('#hProd').value,hoje=dkey(Date.now());let de='',ate='';
@@ -603,7 +605,7 @@ function rHis(){const v=$('#hProd').value;
  $('#hProd').innerHTML='<option value="">Todos os produtos</option>'+db.prods.map(p=>`<option value="${p.id}">${esc(p.ref)} - ${esc(p.marca)}</option>`).join('');$('#hProd').value=v;
  $('#hDatas').hidden=$('#hPer').value!='datas';
  const L=hisFiltro(),r=hisRes(L);
- $('#hs').innerHTML=`<div><b>+${r.en}</b><span>peças que entraram</span></div><div><b>−${r.sa}</b><span>peças que saíram</span></div><div><b>${R(r.ga)}</b><span>gasto em compras de mercadoria</span></div><div><b>${R(r.ve)}</b><span>valor vendido (sem cancelamentos)</span></div>`;
+ $('#hs').innerHTML=`<div><b>+${r.en}</b><span>peças que entraram</span></div><div><b>−${r.sa}</b><span>peças que saíram</span></div><div><b>${R(r.ga)}</b><span>gasto em compras de mercadoria</span></div><div><b>${R(r.ve)}</b><span>valor vendido (com desconto, sem cancelamentos)</span></div>`;
  const rs=$('#hVer').value=='resumo';$('#hResumo').hidden=!rs;$('#hLista').hidden=rs;
  if(rs)$('#hResumo').innerHTML=hisProd(L).map(cardProd).join('')||'<div class="card vazio">Nenhuma movimentação encontrada.</div>';
  $('#tbHis').innerHTML=L.map(m=>`<tr><td>${m.pid?`<a href="#" onclick="verHis('${m.pid}');return false" style="color:inherit;font-weight:600">${esc(m.ref)}</a>`:esc(m.ref)}<small>${esc(m.marca||'')}</small></td><td>${esc(m.t)}<small>${dt(m.ts)}</small><small><b style="display:inline">${qtHist(m)}</b>${m.dep!==undefined?' · Em estoque: <b style="display:inline">'+m.dep+'</b>':''}</small></td><td class="h-q"><span class="bd ${m.q>0?'bd-ok':'bd-lo'}">${m.q>0?'+':'−'}${Math.abs(m.q)}</span>${temVal(m)?'<small>'+R(m.v)+'</small>':''}</td></tr>`).join('')||'<tr><td colspan="3" class="vazio">Nenhuma movimentação encontrada.</td></tr>'}
@@ -614,7 +616,7 @@ $('#hPdf').onclick=()=>{const L=hisFiltro(),r=hisRes(L),tr=(t,n)=>String(t).slic
  const per=o('#hPer')+($('#hPer').value=='datas'?' ('+($('#hDe').value||'início')+' a '+($('#hAte').value||'hoje')+')':'');
  const rows=[{s:18,b:1,c:[[40,tr(loja(),40)]]},{s:11,g:2,c:[[40,'Histórico do estoque - '+o('#hVer')]]},
  {s:9,g:6,c:[[40,'Período: '+per+'   Tipo: '+o('#hTipo')+'   Produto: '+tr(o('#hProd'),28)]]},
- {c:[[40,'Peças que entraram: '+r.en+'   Peças que saíram: '+r.sa]]},{c:[[40,'Gasto em compras de mercadoria: '+money(r.ga)+'   Valor vendido (sem cancelamentos): '+money(r.ve)]]}];
+ {c:[[40,'Peças que entraram: '+r.en+'   Peças que saíram: '+r.sa]]},{c:[[40,'Gasto em compras de mercadoria: '+money(r.ga)+'   Valor vendido (com desconto, sem cancelamentos): '+money(r.ve)]]}];
  if(rs){rows.push({s:13,b:1,g:12,c:[[40,'Resumo por produto']]});const H=hisProd(L);
   H.forEach(x=>{const full=x.ini!==undefined;rows.push({s:11,b:1,g:8,c:[[40,tr(x.ref+' - '+x.marca,42)],[340,sit(x)]]},
    {s:10,c:[[40,(full?'Começou com '+x.ini+'     ':'')+'Entraram +'+x.en+'     Saíram -'+x.sa+(full?'     Ficou com '+x.fim:'')]]},
@@ -751,7 +753,12 @@ function rInst(){const st=matchMedia('(display-mode: standalone)').matches||navi
 $('#instBtn').onclick=async()=>{if(!instEv)return;instEv.prompt();await instEv.userChoice;instEv=null;rInst()};
 
 /* ===== banco de dados na nuvem (Firebase Realtime Database, via REST) ===== */
-const FB={get:()=>{try{return JSON.parse(localStorage.getItem('estq_fb')||'null')}catch(e){return null}},set:o=>localStorage.setItem('estq_fb',JSON.stringify(o))};
+const fbCkPath=()=>{try{const p=location.pathname||'/';return p.slice(0,p.lastIndexOf('/')+1)||'/'}catch(e){return '/'}};
+const fbCkGet=()=>{try{const m=document.cookie.split('; ').find(x=>x.indexOf('estq_fb=')==0);const o=m?JSON.parse(decodeURIComponent(m.slice(8))):null;return o&&typeof o=='object'?o:null}catch(e){return null}};
+const fbCkSet=o=>{try{document.cookie='estq_fb='+encodeURIComponent(JSON.stringify(o))+'; max-age=31536000; path='+fbCkPath()+'; SameSite=Lax'+(location.protocol=='https:'?'; Secure':'')}catch(e){}};
+const FB={get:()=>{let o=null;try{o=JSON.parse(localStorage.getItem('estq_fb')||'null')}catch(e){}
+ if(!o||typeof o!='object'){o=fbCkGet();if(o){try{localStorage.setItem('estq_fb',JSON.stringify(o))}catch(e){}}}return o||null},
+ set:o=>{try{localStorage.setItem('estq_fb',JSON.stringify(o))}catch(e){}fbCkSet(o)}};
 const FBc=FB.get,agoraH=()=>new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 let fbTok=null,fbBusy=false,fbTimer=null,fbUlt=0;const fbSig={};
 const fbStatus=(t,erro)=>{const e=$('#fbSt');if(e){e.textContent=t;e.style.color=erro?'#b3261e':''}};
@@ -759,11 +766,12 @@ const fbOn=()=>{const c=FBc();return !!(c&&c.refresh&&c.ok)};
 function fbMsg(j){const m=String(j&&j.error&&(j.error.message||j.error)||''),T={EMAIL_EXISTS:'Este e-mail já tem conta. Use Entrar.',EMAIL_NOT_FOUND:'E-mail não encontrado. Use Criar conta.',INVALID_PASSWORD:'Senha incorreta.',INVALID_LOGIN_CREDENTIALS:'E-mail ou senha incorretos.',OPERATION_NOT_ALLOWED:'Ative o login por E-mail/senha no Firebase (Authentication).',TOO_MANY_ATTEMPTS_TRY_LATER:'Muitas tentativas. Aguarde um pouco e tente de novo.',WEAK_PASSWORD:'A senha precisa ter pelo menos 6 caracteres.',INVALID_EMAIL:'E-mail inválido.'};
  for(const k in T)if(m.includes(k))return T[k];if(/API key/i.test(m))return 'Chave da API inválida.';return m||'Não foi possível conectar.'}
 async function fbJson(url,opt){let r;try{r=await fetch(url,opt)}catch(e){throw new Error('Sem conexão ou endereço inválido.')}
- const j=await r.json().catch(()=>null);if(!r.ok){if(r.status==401||r.status==403)throw new Error('Sem permissão no banco. Confira as regras (passo 3).');throw new Error(fbMsg(j)||'Erro '+r.status)}return j}
+ const j=await r.json().catch(()=>null);if(!r.ok){const cod=String(j&&j.error&&j.error.message||''),er=new Error(r.status==401||r.status==403?'Sem permissão no banco. Confira as regras (passo 3).':(fbMsg(j)||'Erro '+r.status));er.fbCode=cod;throw er}return j}
 async function fbAuth(modo,email,senha){const c=FBc(),j=await fbJson('https://identitytoolkit.googleapis.com/v1/accounts:'+(modo=='up'?'signUp':'signInWithPassword')+'?key='+encodeURIComponent(c.key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:senha,returnSecureToken:true})});
- fbTok={id:j.idToken,exp:Date.now()+(+j.expiresIn-60)*1000};FB.set({key:c.key,url:c.url,email,uid:j.localId,refresh:j.refreshToken})}
+ fbTok={id:j.idToken,exp:Date.now()+(+j.expiresIn-60)*1000};FB.set({key:c.key,url:c.url,email,uid:j.localId,refresh:j.refreshToken,ok:c.ok,ult:c.ult})}
 async function fbToken(){const c=FBc();if(!c||!c.refresh)throw new Error('Entre na sua conta primeiro.');if(fbTok&&Date.now()<fbTok.exp)return fbTok.id;
- const j=await fbJson('https://securetoken.googleapis.com/v1/token?key='+encodeURIComponent(c.key),{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(c.refresh)});
+ let j;try{j=await fbJson('https://securetoken.googleapis.com/v1/token?key='+encodeURIComponent(c.key),{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(c.refresh)})}
+ catch(e){if(/TOKEN_EXPIRED|INVALID_REFRESH_TOKEN|USER_NOT_FOUND|USER_DISABLED|CREDENTIAL_TOO_OLD_LOGIN_AGAIN|MISSING_REFRESH_TOKEN/.test(e.fbCode||'')){fbTok=null;const n={...c};delete n.refresh;FB.set(n);rFb();const x=new Error('Sua sessão expirou. Digite a senha e toque em Entrar');x.sessao=true;throw x}throw e}
  fbTok={id:j.id_token,exp:Date.now()+(+j.expires_in-60)*1000};FB.set({...c,refresh:j.refresh_token});return fbTok.id}
 const fbU=async p=>{const c=FBc(),t=await fbToken();return c.url.replace(/\/+$/,'')+'/lojas/'+c.uid+'/'+p+'.json?auth='+encodeURIComponent(t)};
 const fbGet=async p=>fbJson(await fbU(p));
@@ -775,7 +783,7 @@ async function fbEnviar(){const c=FBc();if(!c||!c.refresh||fbBusy)return;fbBusy=
   for(const id in fotos){const g=fotos[id].length+':'+fotos[id].slice(-24);if(fbSig[id]!==g){await fbPut('fotos/'+id,fotos[id]);fbSig[id]=g}}
   if(logo){const g=logo.length+':'+logo.slice(-24);if(fbSig.__logo!==g){await fbPut('logo',logo);fbSig.__logo=g}}
   await fbPut('dados',d);await fbPut('meta',{atualizado:db.cfg.atualizado});FB.set({...FBc(),ok:1,ult:db.cfg.atualizado});fbUlt=Date.now();fbStatus('Sincronizado às '+agoraH()+'.')}
- catch(e){fbStatus('Não foi possível enviar: '+e.message,true)}fbBusy=false}
+ catch(e){fbStatus(e.sessao?e.message:'Não foi possível enviar: '+e.message,true)}fbBusy=false}
 async function fbBaixar(m){fbStatus('Baixando da nuvem...');const d=await fbGet('dados');if(!d)throw new Error('A nuvem está vazia.');
  const fotos=(await fbGet('fotos'))||{},logo=d.cfg&&d.cfg.logo?await fbGet('logo'):'';
  d.prods=(d.prods||[]).map(p=>({...p,foto:fotos[p.id]||''}));d.sales=d.sales||[];d.entradas=d.entradas||[];d.cfg=d.cfg||{};d.cfg.donos=d.cfg.donos||[];
@@ -814,12 +822,13 @@ async function fbEntrar(modo){const key=$('#fbKey').value.trim(),url=$('#fbUrl')
  if(!key||!url||!email||!senha)return alert('Preencha a chave da API, o endereço do banco, o e-mail e a senha.');
  if(!/^https:\/\/.+/.test(url))return alert('O endereço do banco deve começar com https://');
  fbStatus('Conectando...');
- try{FB.set({key,url,email});fbTok=null;await fbAuth(modo,email,senha);$('#fbPass').value='';rFb();await fbSincronizar()}catch(e){fbStatus(e.message,true);rFb()}}
+ try{const ant=FBc()||{};FB.set({key,url,email,...(ant.email===email&&ant.ok?{ok:ant.ok,ult:ant.ult}:{})});fbTok=null;await fbAuth(modo,email,senha);$('#fbPass').value='';rFb();await fbSincronizar()}catch(e){fbStatus(e.message,true);rFb()}}
 $('#fbIn').onclick=()=>fbEntrar('in');$('#fbUp').onclick=()=>fbEntrar('up');
 $('#fbNow').onclick=()=>fbSincronizar();
 $('#fbOut').onclick=()=>{const c=FBc();FB.set({key:c.key,url:c.url,email:c.email});fbTok=null;rFb();fbStatus('Desconectado. Os dados continuam neste aparelho.')};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&fbOn()&&Date.now()-fbUlt>15000)fbSincronizar()});
 addEventListener('online',()=>{if(fbOn())fbSincronizar()});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{})}catch(e){}
 if(FBc()&&FBc().refresh)fbSincronizar();
 $('#lojaNome').textContent=db.cfg.loja||'PURE CLEAN PRO';rSlogan();rLogo();
 show('inicio');
