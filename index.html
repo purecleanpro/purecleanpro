@@ -49,6 +49,16 @@ tr.low td{background:#fff6e5}.ph,td img,.pv{width:44px;height:44px;border-radius
 .pay input{display:none}.pay label:has(input:checked){background:var(--blue);color:#fff;border-color:var(--blue)}
 #rec{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:16px;z-index:9}
 #rec.on{display:flex}#rec .card{max-width:440px;width:100%;margin:0;max-height:92vh;overflow:auto}
+.vis{display:flex;gap:8px;margin-top:2px}.vis button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px}.vis svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pgrid.lista{grid-template-columns:minmax(0,1fr)!important;gap:10px}
+.pl{display:flex;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-width:0}.pl.low{border-color:var(--acc)}
+.pl .pk-img{flex:0 0 112px;width:112px;aspect-ratio:auto;align-self:stretch;border:0;border-right:1px solid var(--line)}
+.pl .pk-img img,.pl .pk-img .ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pl-b{flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.pl-b .pk-ref{font-size:15px}.pl-b .pk-pr{margin-top:2px}.pl-b .bd{align-self:flex-start;margin-top:2px;font-size:12px;padding:2px 9px}
+.pl-b .pk-n{margin:6px 0 2px}.pl-b .ac{margin-top:6px;gap:6px}.pl-b .ac button{flex:1 1 auto;padding:6px 8px;font-size:13px}
+#fbMd{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+#fbMd.on{display:flex}#fbMd .card{max-width:440px;width:100%;margin:0;max-height:92vh;overflow:auto}
 pre{white-space:pre;background:#fff;padding:16px 14px;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;width:fit-content;max-width:100%;margin:0 auto 14px;border:1px solid var(--line);border-top:3px dashed #8fd0e0;border-bottom:3px dashed #8fd0e0;overflow-x:auto}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .vazio{color:var(--mut);padding:10px 0}
@@ -238,6 +248,7 @@ body.menu #side{transform:none}
 <section id="estoque">
  <div id="alerta" hidden></div>
  <div class="card"><label>Buscar produto<input id="busca" placeholder="Referência, marca ou descrição"></label>
+  <div class="vis" id="visEst" role="group" aria-label="Modo de visualização"><button class="b sm" type="button" data-v="g"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Grade</button><button class="b sm" type="button" data-v="l"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="6" height="6" rx="1"/><rect x="3" y="14" width="6" height="6" rx="1"/><path d="M13 7h8M13 17h8"/></svg>Lista</button></div>
  </div><div class="pgrid" id="tbEst"></div>
 </section>
 
@@ -313,10 +324,12 @@ body.menu #side{transform:none}
  <div class="card" id="instCard"><h2>Instalar como aplicativo</h2><p class="dica">Coloque o sistema na tela inicial do celular, com ícone próprio, e abra como um aplicativo, até sem internet.</p>
   <button class="b" id="instBtn" type="button" hidden>Instalar aplicativo</button><p class="dica" id="instSt" style="margin:8px 0 0"></p></div>
  <div class="card" id="fbCard"><h2>Banco de dados na nuvem (Firebase)</h2><p class="dica">Guarda seus dados na nuvem e mantém seus aparelhos iguais. Para sincronizar é preciso ter internet.</p>
-  <div id="fbCfg"><label>Chave da API (apiKey)<input id="fbKey" autocomplete="off"></label><label>Endereço do banco (databaseURL)<input id="fbUrl" placeholder="https://seu-projeto-default-rtdb.firebaseio.com" autocomplete="off"></label>
+  <div id="fbCfg"><label style="display:none">Chave da API (apiKey)<input id="fbKey" autocomplete="off"></label><label style="display:none">Endereço do banco (databaseURL)<input id="fbUrl" placeholder="https://seu-projeto-default-rtdb.firebaseio.com" autocomplete="off"></label>
    <div class="fg"><label>E-mail de acesso<input id="fbMail" type="email" autocomplete="username"></label><label>Senha<input id="fbPass" type="password" autocomplete="current-password"></label></div>
    <div class="row"><button class="b" id="fbIn" type="button">Entrar</button><button class="b s bord" id="fbUp" type="button">Criar conta</button></div></div>
-  <div id="fbOn" hidden><p id="fbWho" style="margin:0 0 10px;font-weight:600"></p><div class="row"><button class="b" id="fbNow" type="button">Sincronizar agora</button><button class="b d" id="fbOut" type="button">Sair</button></div></div>
+  <div id="fbOn" hidden><p id="fbWho" style="margin:0 0 10px;font-weight:600"></p><div class="row"><button class="b" id="fbNow" type="button">Sincronizar agora</button><button class="b d" id="fbOut" type="button">Sair</button></div>
+   <div id="fbUso" style="margin-top:14px"><b style="color:var(--ink)">Espaço do banco de dados</b><div style="height:12px;background:#e1f2f8;border-radius:999px;overflow:hidden;margin:8px 0"><div id="fbUsoBar" style="height:100%;width:0;background:var(--blue);border-radius:999px;transition:width .4s"></div></div>
+    <p id="fbUsoTx" style="margin:0 0 4px;font-weight:600;color:var(--ink)">Calculando...</p><p class="dica" style="margin:0">Limite do plano gratuito do Firebase: 1 GB. O valor é aproximado e conta os dados desta loja (produtos, vendas, fotos e logo).</p></div></div>
   <p class="dica" id="fbSt" style="margin:10px 0 0"></p>
   <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600;color:var(--ink)">Como configurar (passo a passo)</summary>
    <ol class="dica" style="padding-left:20px;margin:8px 0 0"><li>Acesse <b>console.firebase.google.com</b> e crie um projeto (pode desativar o Google Analytics).</li>
@@ -336,6 +349,10 @@ body.menu #side{transform:none}
 </section>
 </main>
 
+<div id="fbMd"><div class="card"><h2>Conectar ao banco de dados</h2><p class="dica">Entre com o e-mail e a senha da sua loja para guardar e sincronizar seus dados na nuvem.</p>
+ <form id="fbMf"><label>E-mail de acesso<input id="mdMail" type="email" autocomplete="username"></label><label>Senha<input id="mdPass" type="password" autocomplete="current-password"></label>
+  <p class="dica" id="mdErr" style="color:#b3261e;margin:0 0 10px" role="alert"></p>
+  <div class="row"><button class="b" type="submit" id="mdIn">Entrar</button><button class="b s bord" type="button" id="mdNo">Agora não</button></div></form></div></div>
 <div id="rec"><div class="card"><h2>Venda concluída</h2><div id="recBox" class="cupom"></div><p class="dica" id="recNote" style="margin:0 0 10px">Comprovante finalizado: os dados da venda não podem ser alterados.</p>
  <label>WhatsApp do cliente<input id="recTel" inputmode="tel" placeholder="(11) 99999-9999"></label>
  <div class="row"><button class="b w" id="recWa">Enviar comprovante no WhatsApp</button><button class="b sh" id="recSh" aria-label="Compartilhar comprovante" title="Compartilhar"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button><button class="b s" id="recPr">Imprimir comprovante</button><button class="b s" id="recX">Fechar</button></div></div></div>
@@ -378,9 +395,13 @@ function rEst(){
  const custo=db.prods.reduce((a,p)=>a+p.qtd*p.compra,0),hojeV=db.sales.filter(s=>dkey(s.ts)==hoje&&!s.canc).reduce((a,s)=>a+s.total,0);
  const al=$('#alerta');al.hidden=!low.length;
  al.innerHTML=low.length?`<b>Atenção: ${low.length} produto(s) com pouco estoque.</b> Comprar mais: ${low.map(p=>esc(p.ref)+' ('+(p.ideal-p.qtd)+')').join(', ')}`:'';
+ const vl=visEst()=='l';$('#tbEst').className='pgrid'+(vl?' lista':'');$$('#visEst button').forEach(b=>{const on=b.dataset.v==(vl?'l':'g');b.classList.toggle('s',!on);b.classList.toggle('bord',!on);b.setAttribute('aria-pressed',on)});
  $('#tbEst').innerHTML=db.prods.filter(p=>(p.ref+p.marca+p.desc).toLowerCase().includes(q)).map(p=>{const r=Math.max(0,p.ideal-p.qtd);
+  if(vl)return `<div class="pl${r?' low':''}"><div class="pk-img" onclick="zoom('${p.id}')">${img(p)}</div><div class="pl-b"><b class="pk-ref">${esc(p.ref)}</b><span class="pk-m">${esc(p.marca)}${p.desc?' · '+esc(p.desc):''}</span><b class="pk-pr">${R(p.venda)}</b><span class="bd ${r?'bd-lo':'bd-ok'}">${r?'Comprar mais: '+r:'Estoque bom'}</span><div class="pk-n"><div><span>Vendidos</span><b>${sold(p.id)}</b></div><div><span>Em estoque</span><b>${p.qtd}</b></div><div><span>Ideal</span><b>${p.ideal}</b></div></div><div class="ac"><button class="b s sm" onclick="verHis('${p.id}')">Histórico</button><button class="b s sm" onclick="edit('${p.id}')">Editar</button><button class="b d sm" onclick="del('${p.id}')">Excluir</button></div></div></div>`;
   return `<div class="pk${r?' low':''}"><div class="pk-img" onclick="zoom('${p.id}')">${img(p)}<span class="bd pk-st ${r?'bd-lo':'bd-ok'}">${r?'Comprar mais: '+r:'Estoque bom'}</span></div><div class="pk-s"><b class="pk-ref">${esc(p.ref)}</b><span class="pk-m">${esc(p.marca)}${p.desc?' · '+esc(p.desc):''}</span></div><div class="pk-b"><div class="pk-n"><div><span>Vendidos</span><b>${sold(p.id)}</b></div><div><span>Em estoque</span><b>${p.qtd}</b></div><div><span>Ideal</span><b>${p.ideal}</b></div></div><div class="ac"><button class="b s sm" onclick="verHis('${p.id}')">Histórico</button><button class="b s sm" onclick="edit('${p.id}')">Editar</button><button class="b d sm" onclick="del('${p.id}')">Excluir</button></div></div></div>`}).join('')||'<div class="vazio" style="grid-column:1/-1">Nenhum produto ainda. Use a aba Cadastrar produtos.</div>';
 }
+const visEst=()=>{try{return localStorage.getItem('estq_vis')=='l'?'l':'g'}catch(e){return 'g'}};
+$$('#visEst button').forEach(b=>b.onclick=()=>{try{localStorage.setItem('estq_vis',b.dataset.v)}catch(e){}rEst()});
 $('#busca').oninput=rEst;
 
 /* produtos */
@@ -759,9 +780,16 @@ const fbCkSet=o=>{try{document.cookie='estq_fb='+encodeURIComponent(JSON.stringi
 const FB={get:()=>{let o=null;try{o=JSON.parse(localStorage.getItem('estq_fb')||'null')}catch(e){}
  if(!o||typeof o!='object'){o=fbCkGet();if(o){try{localStorage.setItem('estq_fb',JSON.stringify(o))}catch(e){}}}return o||null},
  set:o=>{try{localStorage.setItem('estq_fb',JSON.stringify(o))}catch(e){}fbCkSet(o)}};
-const FBc=FB.get,agoraH=()=>new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+const FB_DEF={key:'AIzaSyBrfdzxBz5Tnfnw0H3xwES_UgjDa_c1thE',url:'https://pure-clean-pro-default-rtdb.firebaseio.com'};
+const FBc=()=>{const c=FB.get(),o=c&&typeof c=='object'?{...c}:{};if(!o.key)o.key=FB_DEF.key;if(!o.url)o.url=FB_DEF.url;return o},agoraH=()=>new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 let fbTok=null,fbBusy=false,fbTimer=null,fbUlt=0;const fbSig={};
-const fbStatus=(t,erro)=>{const e=$('#fbSt');if(e){e.textContent=t;e.style.color=erro?'#b3261e':''}};
+const fbStatus=(t,erro)=>{const e=$('#fbSt');if(e){e.textContent=t;e.style.color=erro?'#b3261e':''}if(!erro&&/^(Tudo sincronizado|Sincronizado)/.test(t))fbUso(true)};
+const FB_LIM=1073741824;let fbUsoT=0;
+const fbTam=b=>b<1024?b+' B':b<1048576?Math.round(b/1024)+' KB':b<FB_LIM?(b/1048576).toFixed(1).replace('.',',')+' MB':(b/FB_LIM).toFixed(2).replace('.',',')+' GB';
+async function fbUso(forca){const c=FBc();if(!c||!c.refresh||!c.uid)return;const tx=$('#fbUsoTx');if(!tx)return;if(!forca&&Date.now()-fbUsoT<30000)return;fbUsoT=Date.now();
+ try{const t=await fbToken(),r=await fetch(c.url.replace(/\/+$/,'')+'/lojas/'+c.uid+'.json?auth='+encodeURIComponent(t));if(!r.ok)throw new Error('http');const b=new Blob([await r.text()]).size,pc=b/FB_LIM*100;
+  tx.textContent='Usado: '+fbTam(b)+' de 1 GB ('+pc.toFixed(2).replace('.',',')+'%)';$('#fbUsoBar').style.width=(b>0?Math.max(1,Math.min(100,pc)):0)+'%';$('#fbUsoBar').style.background=pc>=80?'#b3261e':pc>=50?'#b45f00':''}
+ catch(e){fbUsoT=0;tx.textContent='Não foi possível ver o espaço agora. Toque em Sincronizar agora para tentar de novo.'}}
 const fbOn=()=>{const c=FBc();return !!(c&&c.refresh&&c.ok)};
 function fbMsg(j){const m=String(j&&j.error&&(j.error.message||j.error)||''),T={EMAIL_EXISTS:'Este e-mail já tem conta. Use Entrar.',EMAIL_NOT_FOUND:'E-mail não encontrado. Use Criar conta.',INVALID_PASSWORD:'Senha incorreta.',INVALID_LOGIN_CREDENTIALS:'E-mail ou senha incorretos.',OPERATION_NOT_ALLOWED:'Ative o login por E-mail/senha no Firebase (Authentication).',TOO_MANY_ATTEMPTS_TRY_LATER:'Muitas tentativas. Aguarde um pouco e tente de novo.',WEAK_PASSWORD:'A senha precisa ter pelo menos 6 caracteres.',INVALID_EMAIL:'E-mail inválido.'};
  for(const k in T)if(m.includes(k))return T[k];if(/API key/i.test(m))return 'Chave da API inválida.';return m||'Não foi possível conectar.'}
@@ -817,7 +845,7 @@ async function fbSincronizar(){const c=FBc();if(!c||!c.refresh||fbBusy)return;
   if(loc>m.atualizado)return await fbEnviar();
   fbUlt=Date.now();fbStatus('Tudo sincronizado às '+agoraH()+'.')}
  catch(e){fbStatus(e.message,true)}}
-function rFb(){const c=FBc(),on=!!(c&&c.refresh);$('#fbCfg').hidden=on;$('#fbOn').hidden=!on;if(c){$('#fbKey').value=c.key||'';$('#fbUrl').value=c.url||'';$('#fbMail').value=c.email||''}$('#fbWho').textContent=on?'Conectado como '+c.email:''}
+function rFb(){const c=FBc(),on=!!(c&&c.refresh);$('#fbCfg').hidden=on;$('#fbOn').hidden=!on;if(c){$('#fbKey').value=c.key||'';$('#fbUrl').value=c.url||'';$('#fbMail').value=c.email||''}$('#fbWho').textContent=on?'Conectado como '+c.email:'';if(on)fbUso()}
 async function fbEntrar(modo){const key=$('#fbKey').value.trim(),url=$('#fbUrl').value.trim().replace(/\/+$/,''),email=$('#fbMail').value.trim(),senha=$('#fbPass').value;
  if(!key||!url||!email||!senha)return alert('Preencha a chave da API, o endereço do banco, o e-mail e a senha.');
  if(!/^https:\/\/.+/.test(url))return alert('O endereço do banco deve começar com https://');
@@ -830,6 +858,20 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&fbOn()&&D
 addEventListener('online',()=>{if(fbOn())fbSincronizar()});
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{})}catch(e){}
 if(FBc()&&FBc().refresh)fbSincronizar();
+/* ===== janela "Conectar ao banco de dados" ===== */
+const fbMdFechar=()=>{$('#fbMd').classList.remove('on')};
+const fbAtivLink=()=>/[?&#](ativar|ativacao|ativação|ativ)=/i.test((location.search||'')+(location.hash||''));
+$('#mdNo').onclick=()=>{try{sessionStorage.setItem('fbAgora','1')}catch(e){}fbMdFechar()};
+$('#fbMf').onsubmit=async ev=>{ev.preventDefault();const em=$('#mdMail').value.trim(),se=$('#mdPass').value,er=$('#mdErr'),bt=$('#mdIn');er.textContent='';
+ if(!em||!se){er.textContent='Digite o e-mail e a senha.';return}
+ bt.disabled=true;er.style.color='';er.textContent='Conectando...';
+ try{rFb();$('#fbMail').value=em;$('#fbPass').value=se;await fbEntrar('in');
+  const c=FBc();if(c&&c.refresh){$('#mdPass').value='';er.textContent='';fbMdFechar()}
+  else{er.style.color='#b3261e';er.textContent=($('#fbSt')&&$('#fbSt').textContent)||'Não foi possível entrar.'}}
+ catch(e){er.style.color='#b3261e';er.textContent=(e&&e.message)||'Não foi possível entrar.'}
+ bt.disabled=false};
+try{let jaFechou=false;try{jaFechou=sessionStorage.getItem('fbAgora')=='1'}catch(e){}
+ if(!(FBc()&&FBc().refresh)&&!fbAtivLink()&&!jaFechou)$('#fbMd').classList.add('on')}catch(e){}
 $('#lojaNome').textContent=db.cfg.loja||'PURE CLEAN PRO';rSlogan();rLogo();
 show('inicio');
 </script></body></html>
