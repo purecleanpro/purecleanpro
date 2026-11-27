@@ -152,6 +152,7 @@ body.menu #side{transform:none}
 .h-l{color:#7ff0ff;font-weight:700;letter-spacing:3px;font-size:13px}.h-v{font-size:44px;font-weight:800;line-height:1.15;margin:4px 0}.h-s{color:#bff6ff;font-size:15px}
 .h-c{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.h-c div{background:rgba(255,255,255,.12);border-radius:16px;padding:10px 6px}
 .h-c span{display:block;color:#7ff0ff;font-size:13px}.h-c b{font-size:18px}
+.h-nv{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;margin-top:12px;padding:14px;border:0;border-radius:16px;background:var(--paper);color:#0b4a61;font:inherit;font-size:19px;font-weight:800;cursor:pointer}.h-nv svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.h-nv:active{transform:scale(.98)}
 .es-box{display:flex;align-items:stretch;background:#eefafd;border-radius:16px;margin-bottom:18px}
 .es-l{flex:0 0 38%;text-align:center;padding:16px 8px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}
 .es-l b{font-size:30px;color:var(--ink)}.es-l span{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut)}
@@ -466,7 +467,7 @@ $('#fin').onclick=()=>{
  if(!cart.length)return alert('Adicione ao menos um produto.');
  const pay=$('input[name=pg]:checked').value,items=cart.map(c=>{const p=db.prods.find(x=>x.id==c.pid);return {pid:p.id,ref:p.ref,marca:p.marca,qtd:c.qtd,preco:p.venda,custo:p.compra}});
  if(items.some(i=>i.qtd>db.prods.find(p=>p.id==i.pid).qtd))return alert('Estoque insuficiente para algum item.');
- const cv=calcV(),s={id:db.sales.length+1,ts:Date.now(),cliente:$('#cNome').value.trim(),tel:$('#cTel').value,pay,parc:pay=='cre'?+$('#parc').value:1,items,sub:cv.sub,desc:cv.desc,total:cv.total,loja:loja(),slg:db.cfg.slogan||''};
+ const cv=calcV(),s={id:db.sales.reduce((a,x)=>Math.max(a,x.id||0),0)+1,ts:Date.now(),cliente:$('#cNome').value.trim(),tel:$('#cTel').value,pay,parc:pay=='cre'?+$('#parc').value:1,items,sub:cv.sub,desc:cv.desc,total:cv.total,loja:loja(),slg:db.cfg.slogan||''};
  items.forEach(i=>db.prods.find(p=>p.id==i.pid).qtd-=i.qtd);
  db.sales.push(s);save();cart=[];$('#cNome').value=$('#cTel').value=$('#dVal').value='';rVenda();openRec(s)};
 
@@ -587,7 +588,8 @@ $('#kSh').onclick=()=>{if(!catSel().length)return alert('Marque ao menos um prod
 const EYE='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>';
 function rHero(){const hoje=dkey(Date.now()),ont=dkey(Date.now()-864e5),mes=hoje.slice(0,7),A=db.sales.filter(s=>!s.canc),oc=!!db.cfg.oculto;
  const sm=f=>A.filter(f).reduce((a,s)=>a+s.total,0),v=n=>oc?'R$ •••••':R(n),h=A.filter(s=>dkey(s.ts)==hoje).length;
- $('#hero').innerHTML=`<div class="hero"><button class="eye" id="eye" type="button" aria-label="${oc?'Mostrar':'Ocultar'} valores">${EYE}${oc?'<path d="M3 3l18 18"/>':''}</svg></button><div class="h-l">HOJE</div><div class="h-v">${v(sm(s=>dkey(s.ts)==hoje))}</div><div class="h-s">em ${h} ${h==1?'venda concluída':'vendas concluídas'}</div><div class="h-c"><div><span>Ontem</span><b>${v(sm(s=>dkey(s.ts)==ont))}</b></div><div><span>Este mês</span><b>${v(sm(s=>dkey(s.ts).slice(0,7)==mes))}</b></div></div></div>`;
+ $('#hero').innerHTML=`<div class="hero"><button class="eye" id="eye" type="button" aria-label="${oc?'Mostrar':'Ocultar'} valores">${EYE}${oc?'<path d="M3 3l18 18"/>':''}</svg></button><div class="h-l">HOJE</div><div class="h-v">${v(sm(s=>dkey(s.ts)==hoje))}</div><div class="h-s">em ${h} ${h==1?'venda concluída':'vendas concluídas'}</div><div class="h-c"><div><span>Ontem</span><b>${v(sm(s=>dkey(s.ts)==ont))}</b></div><div><span>Este mês</span><b>${v(sm(s=>dkey(s.ts).slice(0,7)==mes))}</b></div></div><button class="h-nv" id="hNv" type="button"><svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 7H6"/></svg>Nova venda</button></div>`;
+ $('#hNv').onclick=()=>show('venda');
  $('#eye').onclick=()=>{db.cfg.oculto=!db.cfg.oculto;save();rHero();rEstCard()}}
 function rEstCard(){const P=db.prods,n=P.length,pc=P.reduce((a,p)=>a+p.qtd,0),custo=P.reduce((a,p)=>a+p.qtd*p.compra,0),oc=!!db.cfg.oculto;
  const S=[{n:'Disponíveis',q:P.filter(p=>p.qtd>0&&p.qtd>=p.ideal).length,c:'#12b886'},{n:'Acabando',q:P.filter(p=>p.qtd>0&&p.qtd<p.ideal).length,c:'#ff9f0a'},{n:'Acabou',q:P.filter(p=>p.qtd<=0).length,c:'#ff5a5f'}];
@@ -600,9 +602,9 @@ function rEstCard(){const P=db.prods,n=P.length,pc=P.reduce((a,p)=>a+p.qtd,0),cu
 /* histórico */
 const vendaVals=s=>{const b=s.items.map(i=>i.qtd*i.preco),sub=b.reduce((a,x)=>a+x,0);if(!(s.desc>0)||!(sub>0))return b;const tot=s.total!==undefined?s.total:sub-s.desc;let acc=0;return b.map((x,k)=>{if(k==b.length-1)return rd(tot-acc);const v=rd(x*tot/sub);acc=rd(acc+v);return v})};
 function movs(){const L=[];
- db.entradas.forEach(e=>L.push({ts:e.ts,pid:e.pid,ref:e.ref,marca:e.marca,q:e.qtd,t:e.tipo||'Entrada de mercadoria',c:!e.tipo?'compra':e.tipo.startsWith('Ajuste')?'ajuste':'cadastro',v:e.qtd*(e.custo||0)}));
- db.sales.forEach(s=>{const vv=vendaVals(s);s.items.forEach((i,k)=>L.push({ts:s.ts,pid:i.pid,ref:i.ref,marca:i.marca,q:-i.qtd,t:'Venda nº '+s.id,c:'venda',v:vv[k]}));
-  if(s.canc)s.items.forEach((i,k)=>L.push({ts:s.canc,pid:i.pid,ref:i.ref,marca:i.marca,q:i.qtd,t:'Cancelamento da venda nº '+s.id,c:'cancel',v:vv[k]}))});
+ db.entradas.forEach(e=>L.push({ts:e.ts,pid:e.pid,ref:e.ref,marca:e.marca,q:e.qtd,t:e.tipo||'Entrada de mercadoria',c:!e.tipo?'compra':e.tipo.startsWith('Ajuste')?'ajuste':'cadastro',v:e.qtd*(e.custo||0),ent:e}));
+ db.sales.forEach(s=>{const vv=vendaVals(s);s.items.forEach((i,k)=>L.push({ts:s.ts,pid:i.pid,ref:i.ref,marca:i.marca,q:-i.qtd,t:'Venda nº '+s.id,c:'venda',v:vv[k],sl:s,it:i}));
+  if(s.canc)s.items.forEach((i,k)=>L.push({ts:s.canc,pid:i.pid,ref:i.ref,marca:i.marca,q:i.qtd,t:'Cancelamento da venda nº '+s.id,c:'cancel',v:vv[k],sl:s,it:i}))});
  L.sort((a,b)=>b.ts-a.ts);const cur={};db.prods.forEach(p=>cur[p.id]=p.qtd);
  L.forEach(m=>{if(m.pid in cur){m.dep=cur[m.pid];cur[m.pid]-=m.q;m.antes=cur[m.pid]}});return L}
 function hisFiltro(){const per=$('#hPer').value,t=$('#hTipo').value,pr=$('#hProd').value,hoje=dkey(Date.now());let de='',ate='';
@@ -621,6 +623,15 @@ const cardProd=x=>{const p=x.p,lo=p&&p.qtd<p.ideal,pct=p?Math.min(100,Math.round
  <div class="pc-nums"${full?'':' style="grid-template-columns:repeat(2,1fr)"'}>${full?`<div><span>Começou com</span><b>${x.ini}</b></div>`:''}<div class="g"><span>Entraram</span><b>+${x.en}</b></div><div class="o"><span>Saíram</span><b>−${x.sa}</b></div>${full?`<div><span>Ficou com</span><b>${x.fim}</b></div>`:''}</div>
  ${p?`<div class="bar${lo?' lo':''}"><i style="width:${pct}%"></i></div><small>Hoje tem ${p.qtd} na loja · ideal: ${p.ideal}</small>`:''}
  <small>Compras: ${R(x.ga)} · Vendas: ${R(x.ve)}</small>${p?`<div class="row" style="margin-top:8px"><button class="b s sm" onclick="verMov('${x.pid}')">Ver movimentos deste produto</button></div>`:''}</div>`};
+let hisL=[];
+function delMov(i){const m=hisL[i];if(!m)return;
+ if(m.sl){const sl=m.sl,tot=R(sl.total!==undefined?sl.total:sl.items.reduce((a,x)=>a+x.qtd*x.preco,0)-(sl.desc||0));
+  if(!confirm('Excluir a venda nº '+sl.id+'?\n\n'+sl.items.map(x=>x.qtd+'x '+x.ref).join(', ')+'\nValor: '+tot+'\n\nO valor dela sai de todos os totais do sistema. O estoque atual não muda.'))return;
+  const k=db.sales.indexOf(sl);if(k>=0)db.sales.splice(k,1)}
+ else if(m.ent){const val=temVal(m)?'\nValor: '+R(m.v):'';
+  if(!confirm('Excluir este item do histórico?\n\n'+m.ref+' · '+m.t+'\nQuantidade: '+Math.abs(m.q)+val+'\n\nO valor dele sai de todos os totais do sistema. O estoque atual não muda.'))return;
+  const k=db.entradas.indexOf(m.ent);if(k>=0)db.entradas.splice(k,1)}
+ save();rHis();rHero();rEstCard()}
 function verMov(id){$('#hProd').value=id;$('#hVer').value='lista';rHis()}
 function rHis(){const v=$('#hProd').value;
  $('#hProd').innerHTML='<option value="">Todos os produtos</option>'+db.prods.map(p=>`<option value="${p.id}">${esc(p.ref)} - ${esc(p.marca)}</option>`).join('');$('#hProd').value=v;
@@ -629,7 +640,7 @@ function rHis(){const v=$('#hProd').value;
  $('#hs').innerHTML=`<div><b>+${r.en}</b><span>peças que entraram</span></div><div><b>−${r.sa}</b><span>peças que saíram</span></div><div><b>${R(r.ga)}</b><span>gasto em compras de mercadoria</span></div><div><b>${R(r.ve)}</b><span>valor vendido (com desconto, sem cancelamentos)</span></div>`;
  const rs=$('#hVer').value=='resumo';$('#hResumo').hidden=!rs;$('#hLista').hidden=rs;
  if(rs)$('#hResumo').innerHTML=hisProd(L).map(cardProd).join('')||'<div class="card vazio">Nenhuma movimentação encontrada.</div>';
- $('#tbHis').innerHTML=L.map(m=>`<tr><td>${m.pid?`<a href="#" onclick="verHis('${m.pid}');return false" style="color:inherit;font-weight:600">${esc(m.ref)}</a>`:esc(m.ref)}<small>${esc(m.marca||'')}</small></td><td>${esc(m.t)}<small>${dt(m.ts)}</small><small><b style="display:inline">${qtHist(m)}</b>${m.dep!==undefined?' · Em estoque: <b style="display:inline">'+m.dep+'</b>':''}</small></td><td class="h-q"><span class="bd ${m.q>0?'bd-ok':'bd-lo'}">${m.q>0?'+':'−'}${Math.abs(m.q)}</span>${temVal(m)?'<small>'+R(m.v)+'</small>':''}</td></tr>`).join('')||'<tr><td colspan="3" class="vazio">Nenhuma movimentação encontrada.</td></tr>'}
+ hisL=L;$('#tbHis').innerHTML=L.map((m,hisI)=>`<tr><td>${m.pid?`<a href="#" onclick="verHis('${m.pid}');return false" style="color:inherit;font-weight:600">${esc(m.ref)}</a>`:esc(m.ref)}<small>${esc(m.marca||'')}</small></td><td>${esc(m.t)}<small>${dt(m.ts)}</small><small><b style="display:inline">${qtHist(m)}</b>${m.dep!==undefined?' · Em estoque: <b style="display:inline">'+m.dep+'</b>':''}</small><button class="b d sm" style="margin-top:8px;font-size:15px;padding:8px 16px" onclick="delMov(${hisI})">${m.sl?'Excluir venda':'Excluir'}</button></td><td class="h-q"><span class="bd ${m.q>0?'bd-ok':'bd-lo'}">${m.q>0?'+':'−'}${Math.abs(m.q)}</span>${temVal(m)?'<small>'+R(m.v)+'</small>':''}</td></tr>`).join('')||'<tr><td colspan="3" class="vazio">Nenhuma movimentação encontrada.</td></tr>'}
 function verHis(id){show('hist');$('#hVer').value='lista';$('#hPer').value='tudo';$('#hTipo').value='';$('#hProd').value=id;rHis()}
 ['hVer','hPer','hTipo','hProd','hDe','hAte'].forEach(k=>$('#'+k).onchange=rHis);
 $('#hLimpa').onclick=()=>{$('#hPer').value='tudo';$('#hTipo').value='';$('#hProd').value='';$('#hDe').value=$('#hAte').value='';rHis()};
